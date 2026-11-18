@@ -13,6 +13,7 @@
             --accent-red: #da3633;
             --accent-wait: #d29922;
             --border-color: #30363d;
+            --primary-blue: #58a6ff;
         }
         body {
             font-family: Arial, sans-serif;
@@ -27,8 +28,8 @@
         }
         h1 {
             text-align: center;
-            font-size: 20px;
-            color: #58a6ff;
+            font-size: 22px;
+            color: var(--primary-blue);
             margin-bottom: 15px;
         }
         .card {
@@ -38,15 +39,22 @@
             padding: 15px;
             margin-bottom: 15px;
         }
-        /* Explicit & Prominent Upload Button Styling */
+        label {
+            font-size: 14px;
+            color: #8b949e;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        /* Only Screenshot Upload Box */
         .upload-container {
             background-color: #21262d;
-            border: 2px dashed #58a6ff;
-            padding: 20px;
+            border: 2px dashed var(--primary-blue);
+            padding: 25px;
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-top: 5px;
         }
         .upload-container:hover {
             background-color: #30363d;
@@ -54,7 +62,7 @@
         .upload-container p {
             margin: 0;
             font-size: 16px;
-            color: #58a6ff;
+            color: var(--primary-blue);
             font-weight: bold;
         }
         #fileInput {
@@ -71,9 +79,10 @@
             font-size: 16px;
         }
         button {
-            background-color: #238636;
+            background-color: var(--accent-green);
             font-weight: bold;
             cursor: pointer;
+            margin-top: 15px;
         }
         button:hover {
             background-color: #2ea043;
@@ -100,7 +109,7 @@
         }
         #preview {
             max-width: 100%;
-            max-height: 200px;
+            max-height: 250px;
             margin-top: 10px;
             display: none;
             border-radius: 5px;
@@ -113,42 +122,47 @@
     <h1>🚀 QUOTEX LIVE SIGNAL LAB</h1>
 
     <div class="card">
-        <!-- Clear Upload Box -->
+        <!-- 📸 Screenshot Upload Only -->
+        <label>📸 Upload Chart Screenshot</label>
         <div class="upload-container" onclick="document.getElementById('fileInput').click()">
-            <p>📷 Tap Here to Upload Chart Screenshot</p>
-            <span style="font-size: 12px; color: #8b949e;">(Supports PNG, JPG)</span>
+            <p>Tap Here to Upload Screenshot</p>
+            <span style="font-size: 12px; color: #8b949e;">(PNG, JPG supported)</span>
             <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
         </div>
         <div style="text-align: center;">
             <img id="preview" alt="Screenshot Preview">
         </div>
 
-        <!-- Currency Pairs -->
+        <!-- 💱 17 Currency Pairs -->
+        <label>💱 Select Currency Pair</label>
         <select id="currencyPair">
-            <option value="">Select Currency Pair (17 Pairs)</option>
-            <option>EUR/USD</option><option>GBP/USD</option><option>AUD/USD</option>
-            <option>USD/JPY</option><option>EUR/GBP</option><option>USD/CAD</option>
-            <option>AUD/JPY</option><option>EUR/JPY</option><option>GBP/JPY</option>
-            <option>NZD/USD</option><option>USD/CHF</option><option>EUR/AUD</option>
-            <option>CAD/JPY</option><option>GBP/AUD</option><option>EUR/CAD</option>
-            <option>AUD/CAD</option><option>USD/PKR (OTC)</option>
+            <option value="">-- Choose Currency Pair (17 Pairs) --</option>
+            <option>EUR/USD (OTC)</option><option>GBP/USD (OTC)</option><option>AUD/USD (OTC)</option>
+            <option>USD/JPY (OTC)</option><option>EUR/GBP (OTC)</option><option>USD/CAD (OTC)</option>
+            <option>AUD/JPY (OTC)</option><option>EUR/JPY (OTC)</option><option>GBP/JPY (OTC)</option>
+            <option>NZD/USD (OTC)</option><option>USD/CHF (OTC)</option><option>EUR/AUD (OTC)</option>
+            <option>CAD/JPY (OTC)</option><option>GBP/AUD (OTC)</option><option>EUR/CAD (OTC)</option>
+            <option>AUD/CAD (OTC)</option><option>USD/PKR (OTC)</option>
         </select>
 
-        <button onclick="analyzeMarket()">Analyze Market</button>
+        <!-- ⏱️ Timeframe -->
+        <label>⏱️ Timeframe</label>
+        <select id="timeframe">
+            <option value="1">1 Minute</option>
+            <option value="5">5 Minutes</option>
+        </select>
+
+        <button onclick="analyzeMarket()">ANALYSE SCREENSHOT</button>
     </div>
 
-    <!-- Analysis Results -->
+    <!-- Results Card -->
     <div class="card" id="resultCard" style="display:none;">
-        <h3>📊 Market Analysis Results</h3>
+        <h3>📊 Analysis Results</h3>
         
         <div class="signal-box">
             <div>
-                <p><strong>1 Min Signal</strong></p>
-                <div id="sig1m" class="signal-badge wait">WAIT 🟡</div>
-            </div>
-            <div>
-                <p><strong>5 Min Signal</strong></p>
-                <div id="sig5m" class="signal-badge wait">WAIT 🟡</div>
+                <p><strong>Signal Direction</strong></p>
+                <div id="signalOutput" class="signal-badge wait">WAIT 🟡</div>
             </div>
         </div>
 
@@ -156,7 +170,7 @@
             <p><strong>RSI (14):</strong> <span id="rsiVal">--</span></p>
             <p><strong>EMA (9/21):</strong> <span id="emaVal">--</span></p>
             <p><strong>MACD Status:</strong> <span id="macdVal">--</span></p>
-            <p><strong>Candle Pattern:</strong> <span id="patternVal">--</span></p>
+            <p><strong>Pattern:</strong> <span id="patternVal">--</span></p>
         </div>
     </div>
 </div>
@@ -173,11 +187,12 @@
     }
 
     function analyzeMarket() {
-        const pair = document.getElementById('currencyPair').value;
         const fileInput = document.getElementById('fileInput');
+        const pair = document.getElementById('currencyPair').value;
+        const timeframe = document.getElementById('timeframe').value;
 
-        if(!pair && fileInput.files.length === 0) {
-            alert("براہ کرم کوئی کرنسی سلیکٹ کریں یا اسکرین شاٹ اپ لوڈ کریں!");
+        if(fileInput.files.length === 0 && !pair) {
+            alert("براہ کرم اسکرین شاٹ اپ لوڈ کریں یا کرنسی سلیکٹ کریں!");
             return;
         }
 
@@ -190,16 +205,13 @@
         const rsiList = ["45.2 (Neutral)", "72.4 (Overbought)", "28.6 (Oversold)", "55.8 (Bullish)"];
         const emaList = ["Bullish Crossover", "Bearish Crossover", "Consolidating"];
         const macdList = ["Positive Momentum", "Negative Momentum", "Flat"];
-        const patterns = ["Hammer", "Engulfing", "Dozi", "Marubozu", "Normal Bar"];
+        const patterns = ["Hammer", "Engulfing", "Doji", "Marubozu", "Strong Bar"];
 
-        const s1 = signals[Math.floor(Math.random() * signals.length)];
-        const s2 = signals[Math.floor(Math.random() * signals.length)];
+        const selectedSignal = signals[Math.floor(Math.random() * signals.length)];
 
-        document.getElementById('sig1m').className = "signal-badge " + s1.class;
-        document.getElementById('sig1m').innerText = s1.text;
-
-        document.getElementById('sig5m').className = "signal-badge " + s2.class;
-        document.getElementById('sig5m').innerText = s2.text;
+        const sigBadge = document.getElementById('signalOutput');
+        sigBadge.className = "signal-badge " + selectedSignal.class;
+        sigBadge.innerText = selectedSignal.text + " (" + timeframe + "m)";
 
         document.getElementById('rsiVal').innerText = rsiList[Math.floor(Math.random() * rsiList.length)];
         document.getElementById('emaVal').innerText = emaList[Math.floor(Math.random() * emaList.length)];
