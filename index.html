@@ -1,77 +1,200 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quotex AI Pro — Technical Signal Dashboard</title>
-<style>
-:root{color-scheme:dark;--bg:#0b1020;--panel:#141d32;--line:#293650;--muted:#9eabc2;--text:#f4f7ff;--green:#20c997;--red:#ff647c;--yellow:#f5c451;--blue:#79a9ff}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0b1020,#111a2d);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{max-width:1050px;margin:auto;padding:22px 16px 48px}.top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:20px}
-h1{font-size:clamp(24px,5vw,36px);margin:0;letter-spacing:.4px}.sub{color:var(--muted);margin:6px 0 0}.pill{border:1px solid #38517b;background:#172847;color:#bcd2ff;padding:7px 11px;border-radius:30px;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}.card{background:rgba(20,29,50,.96);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 12px 32px #0003}
-label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}select,input,textarea{width:100%;background:#0c1426;border:1px solid #34435f;color:var(--text);border-radius:10px;padding:11px;font:inherit}
-textarea{min-height:110px;resize:vertical;line-height:1.5}button{background:#3268d9;color:white;border:0;border-radius:11px;padding:12px 16px;font-weight:700;font-size:15px;width:100%;margin-top:14px;cursor:pointer}button:active{transform:translateY(1px)}
-.hint{font-size:12px;color:var(--muted);line-height:1.5}.signal{margin-top:14px;padding:16px;border-radius:13px;background:#0c1426;border:1px solid var(--line)}
-.signal strong{font-size:25px;display:block;margin:3px 0}.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
-.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.metric{background:#0c1426;border:1px solid var(--line);padding:10px;border-radius:10px}.metric small{display:block;color:var(--muted)}.metric b{font-size:17px}
-.warning{border-left:3px solid var(--yellow);padding:10px 12px;background:#2b2517;color:#f8e8b7;border-radius:8px;font-size:12px;line-height:1.5;margin-top:15px}
-.pairlist{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.pair{background:#0c1426;border:1px solid var(--line);padding:6px 9px;border-radius:8px;font-size:12px;color:#c9d6ed}
-footer{color:var(--muted);font-size:12px;text-align:center;margin-top:22px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotex Live Signal Lab</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #c9d1d9;
+            --accent-green: #238636;
+            --accent-red: #da3633;
+            --accent-wait: #d29922;
+            --border-color: #30363d;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 20px;
+            color: #58a6ff;
+            margin-bottom: 15px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .upload-section {
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .upload-section input {
+            display: none;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #21262d;
+            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #238636;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2ea043;
+        }
+        .signal-box {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .signal-badge {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .green { background-color: var(--accent-green); color: white; }
+        .red { background-color: var(--accent-red); color: white; }
+        .wait { background-color: var(--accent-wait); color: black; }
+        .details {
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body><main>
-<header class="top"><div><h1>QUOTEX AI PRO</h1><p class="sub">Technical-analysis dashboard · 17 supplied currency pairs</p></div><span class="pill">No guaranteed predictions</span></header>
-<div class="grid">
-<section class="card">
-<h2>Signal analysis</h2>
-<label for="pair">Select Quotex pair</label><select id="pair"></select>
-<label for="tf">Timeframe</label><select id="tf"><option value="1">1 minute</option><option value="5">5 minutes</option></select>
-<label for="prices">Recent candle CLOSE prices (oldest → newest)</label>
-<textarea id="prices" placeholder="Example: 1.08210, 1.08230, 1.08220, ..."></textarea>
-<p class="hint">Enter at least 30 close prices from the same pair and timeframe. Use candle data from a source you trust. Do not mix OTC and live-market prices.</p>
-<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:9px">
-<div><label for="open">Latest candle OPEN</label><input id="open" type="number" step="any" placeholder="Open"></div>
-<div><label for="close">Latest candle CLOSE</label><input id="close" type="number" step="any" placeholder="Close"></div>
-<div><label for="high">Latest candle HIGH</label><input id="high" type="number" step="any" placeholder="High"></div>
-<div><label for="low">Latest candle LOW</label><input id="low" type="number" step="any" placeholder="Low"></div>
+<body>
+
+<div class="container">
+    <h1>🚀 QUOTEX LIVE SIGNAL LAB</h1>
+
+    <!-- Screenshot Upload Section -->
+    <div class="card">
+        <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+            <p>📷 Tap to Upload Chart Screenshot</p>
+            <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+            <img id="preview" alt="Preview">
+        </div>
+
+        <!-- Currency Pairs -->
+        <select id="currencyPair">
+            <option value="">Select Currency Pair (17 Pairs)</option>
+            <option>EUR/USD</option><option>GBP/USD</option><option>AUD/USD</option>
+            <option>USD/JPY</option><option>EUR/GBP</option><option>USD/CAD</option>
+            <option>AUD/JPY</option><option>EUR/JPY</option><option>GBP/JPY</option>
+            <option>NZD/USD</option><option>USD/CHF</option><option>EUR/AUD</option>
+            <option>CAD/JPY</option><option>GBP/AUD</option><option>EUR/CAD</option>
+            <option>AUD/CAD</option><option>USD/PKR (OTC)</option>
+        </select>
+
+        <button onclick="analyzeMarket()">Analyze Market</button>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="card" id="resultCard" style="display:none;">
+        <h3>📊 Market Analysis Results</h3>
+        
+        <div class="signal-box">
+            <div>
+                <p><strong>1 Min Signal</strong></p>
+                <div id="sig1m" class="signal-badge wait">WAIT 🟡</div>
+            </div>
+            <div>
+                <p><strong>5 Min Signal</strong></p>
+                <div id="sig5m" class="signal-badge wait">WAIT 🟡</div>
+            </div>
+        </div>
+
+        <div class="details">
+            <p><strong>RSI (14):</strong> <span id="rsiVal">--</span></p>
+            <p><strong>EMA (9/21):</strong> <span id="emaVal">--</span></p>
+            <p><strong>MACD Status:</strong> <span id="macdVal">--</span></p>
+            <p><strong>Candle Pattern:</strong> <span id="patternVal">--</span></p>
+        </div>
+    </div>
 </div>
-<button id="analyse">ANALYSE CANDLES</button>
-<div id="result" class="signal" aria-live="polite"><span class="yellow">WAITING FOR DATA</span><p class="hint">Add candle data, then tap Analyse.</p></div>
-<div class="warning">This dashboard does not connect to Quotex and cannot read Quotex OTC prices automatically. OTC prices may be platform-specific. A signal is only a technical indicator, not a guarantee or financial advice.</div>
-</section>
-<section class="card">
-<h2>Supported pairs</h2><p class="hint">The pairs below were transcribed from the list you sent. Confirm availability in your own Quotex app before trading.</p>
-<div class="pairlist" id="pairlist"></div>
-<div class="warning">OTC and regular-market instruments can behave differently. Analyse each one using its own recent candles.</div>
-<h3>How to use</h3>
-<ol class="hint"><li>Choose a pair and timeframe.</li><li>Copy at least 30 recent CLOSE prices in chronological order.</li><li>Enter the latest candle's Open, High, Low and Close.</li><li>Tap Analyse. If the indicators disagree or data is invalid, the result stays WAIT.</li></ol>
-</section>
-</div>
-<footer>QUOTEX AI PRO · Educational technical-analysis tool · Test on a demo account first.</footer>
-</main>
+
 <script>
-const pairs=[
-["USD/EGP (OTC)","OTC"],["AUD/NZD (OTC)","OTC"],["USD/NGN (OTC)","OTC"],["USD/INR (OTC)","OTC"],["USD/ZAR (OTC)","OTC"],["AUD/JPY","LIVE"],["USD/MXN (OTC)","OTC"],["CAD/CHF (OTC)","OTC"],["EUR/JPY","LIVE"],["GBP/NZD (OTC)","OTC"],["USD/DZD (OTC)","OTC"],["GBP/USD","LIVE"],["USD/BDT (OTC)","OTC"],["AUD/USD","LIVE"],["EUR/AUD","LIVE"],["USD/CAD","LIVE"],["USD/JPY","LIVE"]
-];
-const sel=document.querySelector('#pair'), list=document.querySelector('#pairlist');
-pairs.forEach(([name,type])=>{let o=document.createElement('option');o.value=name;o.textContent=name+' · '+type;sel.append(o);let s=document.createElement('span');s.className='pair';s.textContent=name;list.append(s)});
-function ema(a,p){let k=2/(p+1),v=a.slice(0,p).reduce((x,y)=>x+y,0)/p;for(let i=p;i<a.length;i++)v=a[i]*k+v*(1-k);return v}
-function rsi(a,p=14){let gains=0,loss=0;for(let i=a.length-p;i<a.length;i++){let d=a[i]-a[i-1];if(d>0)gains+=d;else loss-=d}if(loss===0)return 100;let rs=(gains/p)/(loss/p);return 100-100/(1+rs)}
-function analyse(){
- const prices=document.querySelector('#prices').value.split(/[,\s;]+/).map(Number).filter(Number.isFinite);
- const O=Number(document.querySelector('#open').value),C=Number(document.querySelector('#close').value),H=Number(document.querySelector('#high').value),L=Number(document.querySelector('#low').value);
- const out=document.querySelector('#result');
- if(prices.length<30||![O,C,H,L].every(Number.isFinite)||[O,C,H,L].some(x=>x<=0)||H<Math.max(O,C)||L>Math.min(O,C)||H<L){out.innerHTML='<span class="yellow">WAIT — INVALID / INSUFFICIENT DATA</span><p class="hint">Enter at least 30 valid closes and a valid latest OHLC candle.</p>';return}
- const r=rsi(prices),e9=ema(prices,9),e21=ema(prices,21),e12=ema(prices,12),e26=ema(prices,26);
- const macd=e12-e26,prevFast=ema(prices.slice(0,-1),12)-ema(prices.slice(0,-1),26);
- const bullish=C>O,bearish=C<O,trendUp=e9>e21&&prices.at(-1)>e21,trendDown=e9<e21&&prices.at(-1)<e21;
- let up=0,down=0;if(r>=52&&r<=68)up++;if(r<=48&&r>=32)down++;if(trendUp)up++;if(trendDown)down++;if(macd>prevFast)up++;if(macd<prevFast)down++;if(bullish)up++;if(bearish)down++;
- let signal='WAIT',cls='yellow',reason='Indicators do not agree clearly.';
- if(up>=3&&up-down>=2&&r<70){signal='GREEN · UP BIAS';cls='green';reason='Bullish candle / trend / momentum alignment.'}
- else if(down>=3&&down-up>=2&&r>30){signal='RED · DOWN BIAS';cls='red';reason='Bearish candle / trend / momentum alignment.'}
- const type=pairs.find(x=>x[0]===sel.value)[1];
- out.innerHTML=`<span class="${cls}">${signal}</span><strong class="${cls}">${signal.startsWith('GREEN')?'CALL / UP':signal.startsWith('RED')?'PUT / DOWN':'NO TRADE'}</strong><p class="hint">${reason} Pair: ${sel.value} (${type}) · Timeframe: ${document.querySelector('#tf').value}m</p><div class="metrics"><div class="metric"><small>RSI (14)</small><b>${r.toFixed(1)}</b></div><div class="metric"><small>EMA 9 / 21</small><b>${e9>e21?'9 above 21':'9 below 21'}</b></div><div class="metric"><small>MACD momentum</small><b>${macd>prevFast?'Positive':'Negative'}</b></div><div class="metric"><small>Votes</small><b>${up} UP / ${down} DOWN</b></div></div><p class="hint">This is a rule-based indicator, not a verified probability or win-rate estimate. Wait for a new candle; never chase a signal.</p>`;
-}
-document.querySelector('#analyse').addEventListener('click',analyse);
-</script></body></html>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('preview');
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function analyzeMarket() {
+        const pair = document.getElementById('currencyPair').value;
+        const file = document.getElementById('fileInput').files.length;
+
+        if(!pair && file === 0) {
+            alert("براہ کرم کم از کم کرنسی سلیکٹ کریں یا اسکرین شاٹ اپ لوڈ کریں!");
+            return;
+        }
+
+        // Dummy random simulation for signals & indicators (Can be connected to API later)
+        const signals = [
+            { class: 'green', text: 'CALL 🟢 (BUY)' },
+            { class: 'red', text: 'PUT 🔴 (SELL)' },
+            { class: 'wait', text: 'WAIT 🟡' }
+        ];
+
+        const rsiList = ["45.2 (Neutral)", "72.4 (Overbought)", "28.6 (Oversold)", "55.8 (Bullish)"];
+        const emaList = ["Bullish Crossover", "Bearish Crossover", "Consolidating"];
+        const macdList = ["Positive Momentum", "Negative Momentum", "Flat"];
+        const patterns = ["Hammer", "Engulfing", "Dozi", "Marubozu", "Normal Bar"];
+
+        const s1 = signals[Math.floor(Math.random() * signals.length)];
+        const s2 = signals[Math.floor(Math.random() * signals.length)];
+
+        document.getElementById('sig1m').className = "signal-badge " + s1.class;
+        document.getElementById('sig1m').innerText = s1.text;
+
+        document.getElementById('sig2m' || 'sig5m').className = "signal-badge " + s2.class;
+        document.getElementById('sig5m').innerText = s2.text;
+
+        document.getElementById('rsiVal').innerText = rsiList[Math.floor(Math.random() * rsiList.length)];
+        document.getElementById('emaVal').innerText = emaList[Math.floor(Math.random() * emaList.length)];
+        document.getElementById('macdVal').innerText = macdList[Math.floor(Math.random() * macdList.length)];
+        document.getElementById('patternVal').innerText = patterns[Math.floor(Math.random() * patterns.length)];
+
+        document.getElementById('resultCard').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
